@@ -58,9 +58,9 @@ docker run -p 8501:8501 --env-file .env \
 
 ## How to set up with Ollama, or Gemini
 You can simply modify the OPENAI_API_URL environment variable to the OpenAI API compatible URL of the server, for example:
-- Ollama: "http://localhost:11434/v1"
-- Gemini: "https://generativelanguage.googleapis.com/v1beta/openai/"
-And add your key to the OPENAI_API_KEY
+- Ollama: http://localhost:11434/v1 \
+In case of Ollama, the *OPENAI_API_KEY* can be anything, but should not be empty
+- Gemini: https://generativelanguage.googleapis.com/v1beta/openai/
 
 ## Known issues
 - Runtime errors appearing on the command line during the inference because of async calls and streamlit. ([Discuss](https://discuss.streamlit.io/t/streamlit-and-asynchronous-functions/30684/3))
