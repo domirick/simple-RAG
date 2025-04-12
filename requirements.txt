@@ -1,0 +1,11 @@
+streamlit
+faiss-cpu
+#faiss-gpu
+langchain
+langchain-community
+langchain-openai
+langchain-huggingface
+unstructured[pdf, docx, html] # Here you can add more, even [all]
+nltk
+rank_bm25
+python-dotenv
