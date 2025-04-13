@@ -44,7 +44,7 @@ if "messages" not in st.session_state:
 
 # Clear chat
 def clear_chat():
-    del st.session_state.messages
+    del st.session_state["messages"]
 
 def reindex_database():
     st.session_state["rag"].reindex_database()

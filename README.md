@@ -13,8 +13,9 @@ SimpleRAG is a RAG system implementing efficient RAG methods - like hybrid searc
     - BM25 for sparse vector search
     - Configurable HuggingFace embedding for dense vector search using FAISS as vector database
 - Reranking (using HuggingFace Crossencoder)
+- Rephrasing
 - Vector database saving on disk
-- Tokenization
+- Basic tokenization
 - CPU or GPU vector calculations (can be changed)
 - Supported document types are: *pdf, docx, html* by default, but in the `requirements.txt` you can extend the unstructured package. [Unstructured supported document types](https://docs.unstructured.io/open-source/core-functionality/partitioning)
 
@@ -45,6 +46,7 @@ docker run -p 8501:8501 --env-file .env \
 | LLM_MODEL               | Name of the LLM model used for generating the response. Model is accessed through the OpenAI API.                                                                                  |
 | RERANKER                | Name of the Cross-encoder reranker model used for reranking the results from hybrid search. **Should be available on HuggingFace.**                                                |
 | DEVICE                  | Target device for calculating the embeddings, *cpu* or *cuda*. For switching to GPU, also change the dependency *faiss-cpu* to *faiss-gpu*. |
+| TEMPERATURE             | Temperature setting for the LLM model. Lower values would result more deterministic answers, while higher values would make the LLM more creative. Ranges between 0.0 - 1.0. |
 | OPENAI_API_URL          | Base URL of the OpenAI API endpoint for the LLM.                                                                                                                                        |
 | OPENAI_API_KEY          | API key for the OpenAI API.                                                                                                                                                        |
 | DOCUMENTS_DIR           | Root directory of the documents to be indexed (only text-based documents are supported currently).                                                                                 |
@@ -66,6 +68,6 @@ In case of Ollama, the *OPENAI_API_KEY* can be anything, but should not be empty
 - Runtime errors appearing on the command line during the inference because of async calls and streamlit. ([Discuss](https://discuss.streamlit.io/t/streamlit-and-asynchronous-functions/30684/3))
 
 ## Future improvements
-- [ ] Rephraseing query (also checking whether db query is needed)
+- [ ] Improve rephraseing (also checking whether db query is needed)
 - [ ] File management from the user interface
 - [ ] Persist keyword retriever's database on disk (e.g.: with ElasticSearch)

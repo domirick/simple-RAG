@@ -4,6 +4,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_openai import ChatOpenAI
 from langchain.chains import create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate
+from langchain.retrievers import RePhraseQueryRetriever
 
 from vector_db import VectorDatabase
 
@@ -33,16 +34,16 @@ class RAGChain:
         retriever = vectorDB.get_retriever()
 
         # Create chain
-        question_answer_chain = create_stuff_documents_chain(RAGChain.get_openai_client(), RAGChain.get_prompt())
-        self.retrieval_chain = create_retrieval_chain(retriever, question_answer_chain)
+        self._create_chain(retriever)
         print("RAG chain initialized.")
 
-    #def inference(self, query, chat_history=None):
-    #    input_with_history = f"{RAGChain.format_history(chat_history)}\nUser: {query}"
-    #    inference_result = self.retrieval_chain.invoke(
-    #        {"input": input_with_history}
-    #    )
-    #    return RAGChain.format_answer(inference_result)
+    def _create_chain(self, retriever):
+        retriever_from_llm = RePhraseQueryRetriever.from_llm(
+            retriever=retriever, llm=RAGChain.get_openai_client()
+        )
+        
+        question_answer_chain = create_stuff_documents_chain(RAGChain.get_openai_client(), RAGChain.get_prompt())
+        self.retrieval_chain = create_retrieval_chain(retriever_from_llm, question_answer_chain)
 
     def inference(self, chat_history):
         inference_result = self.retrieval_chain.invoke(
@@ -57,8 +58,7 @@ class RAGChain:
         retriever = vectordb.get_retriever()
 
         # Recreate chain
-        question_answer_chain = create_stuff_documents_chain(RAGChain.get_openai_client(), RAGChain.get_prompt())
-        self.retrieval_chain = create_retrieval_chain(retriever, question_answer_chain)
+        self._create_chain(retriever)
         print("Database reindexed.")
 
     def get_openai_client():
@@ -67,7 +67,7 @@ class RAGChain:
             model=os.environ["LLM_MODEL"], 
             api_key=os.environ["OPENAI_API_KEY"], 
             base_url=os.environ["OPENAI_API_URL"],
-            temperature=0.7,
+            temperature=os.environ["TEMPERATURE"],
         )
         
         return openai_client
@@ -79,7 +79,7 @@ class RAGChain:
             "information to answer the question, respond with 'I'm not sure based on the provided information.' "
             "Do not make up answers or provide information outside the given context. "
             "Focus on being clear, concise, and helpful."
-            "Answer language should match the question language."
+            "Ensure that the language of your response matches the language of the user's question."
             "\n\n"
             "Context:\n{context}"
         )
@@ -92,7 +92,7 @@ class RAGChain:
         )
 
         return prompt
-    
+
     def format_history(chat_history):
         formatted_history = "\n".join([f"{message['role'].capitalize()}: {message['content']}" for message in chat_history])
         print(formatted_history)
@@ -102,10 +102,17 @@ class RAGChain:
     def format_answer(unformatted_answer):
         formatted_answer = unformatted_answer['answer']
         formatted_answer += "\n\n"
+
+        # Add sources
         formatted_answer += "📃:\n"
+
+        # Create a set of unique sources from the context
         used_sources = {document.metadata['source'] for document in unformatted_answer['context']}
+
+        # Trim the filename
+        used_sources = [os.path.basename(source) for source in used_sources]
+
+        # Form the answer
         for document in used_sources:
-            formatted_answer += f"- {document}"
-        #for document in unformatted_answer['context']:
-        #    formatted_answer += f"- {document.metadata['source']}"
+            formatted_answer += f"- {document}\n"
         return formatted_answer
