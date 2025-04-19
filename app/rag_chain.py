@@ -3,7 +3,7 @@ import os
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_openai import ChatOpenAI
 from langchain.chains import create_retrieval_chain
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain.retrievers import RePhraseQueryRetriever
 
 from vector_db import VectorDatabase
@@ -38,12 +38,36 @@ class RAGChain:
         print("RAG chain initialized.")
 
     def _create_chain(self, retriever):
+        # Create rephrasing retriever
         retriever_from_llm = RePhraseQueryRetriever.from_llm(
-            retriever=retriever, llm=RAGChain.get_openai_client()
+            retriever=retriever, 
+            llm=RAGChain.get_openai_client(),
+            prompt=RAGChain.get_rephrase_prompt(),
         )
         
-        question_answer_chain = create_stuff_documents_chain(RAGChain.get_openai_client(), RAGChain.get_prompt())
-        self.retrieval_chain = create_retrieval_chain(retriever_from_llm, question_answer_chain)
+        # Create QA chain
+        question_answer_chain = create_stuff_documents_chain(
+            RAGChain.get_openai_client(), 
+            RAGChain.get_prompt()
+        )
+
+        # Create retrieval chain
+        self.retrieval_chain = create_retrieval_chain(
+            retriever_from_llm, 
+            question_answer_chain
+        )
+
+    def get_rephrase_prompt():
+        QUERY_PROMPT = PromptTemplate(
+            input_variables=["question"],
+            template="""You are an assistant tasked with taking a natural languge query from a user
+            and converting it into a query for a vectorstore. In the process, strip out all 
+            information that is not relevant for the retrieval task and return a new, simplified
+            question for vectorstore retrieval.
+            Here is the user query: {question} """,
+        )
+
+        return QUERY_PROMPT
 
     def inference(self, chat_history):
         inference_result = self.retrieval_chain.invoke(
