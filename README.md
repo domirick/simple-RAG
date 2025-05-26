@@ -1,6 +1,8 @@
 # SimpleRAG
 SimpleRAG is a RAG system implementing efficient RAG methods - like hybrid search and reranking - and trying to keep everything as simple as possible.
 
+<img src="doc/chat-screenshot.png" alt="chat example of the application" width="50%"/>
+
 ## Tech stack
 - Streamlit
 - LangChain
@@ -18,6 +20,9 @@ SimpleRAG is a RAG system implementing efficient RAG methods - like hybrid searc
 - Basic tokenization
 - CPU or GPU vector calculations (can be changed)
 - Supported document types are: *pdf, docx, html* by default, but in the `requirements.txt` you can extend the unstructured package. [Unstructured supported document types](https://docs.unstructured.io/open-source/core-functionality/partitioning)
+
+## Architecture
+![architecture diagram of the application](doc/architecture.png "Architecture")
 
 ## How to start
 1. Copy the *.env.sample* file and rename it to *.env*
