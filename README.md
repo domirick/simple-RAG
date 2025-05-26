@@ -1,7 +1,7 @@
 # SimpleRAG
 SimpleRAG is a RAG system implementing efficient RAG methods - like hybrid search and reranking - and trying to keep everything as simple as possible.
 
-<img src="doc/chat-screenshot.png" alt="chat example of the application" width="50%"/>
+<img src="doc/chat-screenshot.png" alt="chat example of the application" width="80%"/>
 
 ## Tech stack
 - Streamlit
