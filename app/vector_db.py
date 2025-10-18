@@ -4,7 +4,6 @@ from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.docstore.document import Document
 from langchain.retrievers import EnsembleRetriever
-from langchain.docstore.document import Document
 
 from document_loader import load_documents
 from keyword_search import KeywordRetriever
